@@ -10,6 +10,11 @@ from django.contrib.auth.decorators import user_passes_test, login_required
 from django.shortcuts import render
 from .models import UserProfile
 
+from django.contrib.auth.decorators import permission_required
+from django.http import HttpResponseForbidden
+from django.views.decorators.http import require_http_methods
+
+
 
 # ✅ Function-based view to list all books
 def list_books(request):
@@ -63,3 +68,34 @@ def librarian_view(request):
 @user_passes_test(is_member)
 def member_view(request):
     return render(request, 'relationship_app/member_view.html')
+
+@permission_required('relationship_app.can_add_book', raise_exception=True)
+@require_http_methods(["GET", "POST"])
+def add_book(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        author = request.POST.get('author')
+        Book.objects.create(title=title, author=author)
+        return redirect('list_books')
+    return render(request, 'relationship_app/add_book.html')
+
+
+@permission_required('relationship_app.can_change_book', raise_exception=True)
+@require_http_methods(["GET", "POST"])
+def edit_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    if request.method == 'POST':
+        book.title = request.POST.get('title')
+        book.author = request.POST.get('author')
+        book.save()
+        return redirect('list_books')
+    return render(request, 'relationship_app/edit_book.html', {'book': book})
+
+
+@permission_required('relationship_app.can_delete_book', raise_exception=True)
+@require_http_methods(["POST"])
+def delete_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    book.delete()
+    return redirect('list_books')
+
