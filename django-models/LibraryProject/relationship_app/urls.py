@@ -23,10 +23,10 @@ urlpatterns = [
     path('librarian-role/', librarian_view, name='librarian_view'),
     path('member-role/', member_view, name='member_view'),
 
-    # Task 4 - Book management with custom permissions
-    path('books/add/', add_book, name='add_book'),
-    path('books/edit/<int:book_id>/', edit_book, name='edit_book'),
-    path('books/delete/<int:book_id>/', delete_book, name='delete_book'),
+    # ✅ Task 4: Book CRUD with permissions
+    path('add_book/', add_book, name='add_book'),
+    path('edit_book/<int:book_id>/', edit_book, name='edit_book'),
+    path('delete_book/<int:book_id>/', delete_book, name='delete_book'),
 
 
 ]
