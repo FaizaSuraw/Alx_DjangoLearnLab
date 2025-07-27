@@ -1,3 +1,15 @@
-from django.shortcuts import render
+from django.contrib.auth.decorators import permission_required
+from django.http import HttpResponse
 
-# Create your views here.
+from django.http import HttpResponse
+
+def home_view(request):
+    return HttpResponse("📚 Welcome to the Bookshelf App")
+
+@permission_required('bookshelf.can_view', raise_exception=True)
+def view_books(request):
+    return HttpResponse("You have permission to view books.")
+
+@permission_required('bookshelf.can_create', raise_exception=True)
+def create_book(request):
+    return HttpResponse("You have permission to create a book.")
