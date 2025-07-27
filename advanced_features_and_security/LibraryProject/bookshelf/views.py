@@ -2,11 +2,23 @@ from django.contrib.auth.decorators import permission_required
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import Book
-from .forms import BookForm  #used for safe user input validation
+from .forms import BookForm, ExampleForm  #used for safe user input validation
 
 # Public home view
 def home_view(request):
     return HttpResponse("📚 Welcome to the Bookshelf App")
+def example_form_view(request):
+    if request.method == 'POST':
+        form = ExampleForm(request.POST)
+        if form.is_valid():
+            # Process form data securely here
+            name = form.cleaned_data['name']
+            email = form.cleaned_data['email']
+            return HttpResponse(f"Form submitted successfully by {name}")
+    else:
+        form = ExampleForm()
+
+    return render(request, 'bookshelf/form_example.html', {'form': form})
 
 # Permission-protected view (basic)
 @permission_required('bookshelf.can_view', raise_exception=True)
