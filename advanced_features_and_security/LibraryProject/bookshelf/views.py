@@ -2,8 +2,8 @@ from django.contrib.auth.decorators import permission_required
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import Book
-from .forms import BookForm, ExampleForm  #used for safe user input validation
-
+from .forms import BookForm
+from .forms import ExampleForm 
 # Public home view
 def home_view(request):
     return HttpResponse("📚 Welcome to the Bookshelf App")
