@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
@@ -6,11 +6,10 @@ from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
-from .models import Post
-from .forms import PostForm, CustomUserCreationForm
+from .models import Post, Comment
+from .forms import PostForm, CommentForm, CustomUserCreationForm
 
 def register_view(request):
-    """Handle user registration with validation and automatic login."""
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
@@ -56,7 +55,6 @@ def logout_view(request):
     messages.info(request, "Logged out successfully!")
     return redirect('home')
 
-
 class PostListView(ListView):
     model = Post
     template_name = 'blog/post_list.html'
@@ -66,6 +64,32 @@ class PostListView(ListView):
 class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
+    context_object_name = 'post'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        post = self.get_object()
+        context['comments'] = Comment.objects.filter(post=post).order_by('-created_at')
+        context['comment_form'] = CommentForm()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            messages.error(request, "You must be logged in to comment.")
+            return redirect('login')
+        self.object = self.get_object()
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = self.object
+            comment.author = request.user
+            comment.save()
+            messages.success(request, "Comment posted successfully!")
+            return redirect('post-detail', pk=self.object.pk)
+        context = self.get_context_data()
+        context['comment_form'] = form
+        return self.render_to_response(context)
+
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
@@ -97,3 +121,13 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         post = self.get_object()
         return self.request.user == post.author
+
+@login_required
+def comment_delete(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+    if request.user != comment.author:
+        messages.error(request, "You are not allowed to delete this comment.")
+        return redirect('post-detail', pk=comment.post.pk)
+    comment.delete()
+    messages.success(request, "Comment deleted successfully.")
+    return redirect('post-detail', pk=comment.post.pk)

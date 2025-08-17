@@ -1,31 +1,16 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-
-class CustomUserCreationForm(UserCreationForm):
-    email = forms.EmailField(required=True)
-
-    class Meta:
-        model = User
-        fields = ("username", "email", "password1", "password2")
-from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
+from .models import Post, Comment
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(
         required=True,
-        widget=forms.EmailInput(attrs={
-            'class': 'form-input',
-            'placeholder': 'Email address'
-        }),
+        widget=forms.EmailInput(attrs={'class': 'form-input', 'placeholder': 'Email address'}),
         help_text="Enter a valid email address."
     )
     username = forms.CharField(
-        widget=forms.TextInput(attrs={
-            'class': 'form-input',
-            'placeholder': 'Username'
-        }),
+        widget=forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Username'}),
         help_text="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
     )
     password1 = forms.CharField(
@@ -51,10 +36,17 @@ class CustomUserCreationForm(UserCreationForm):
             raise forms.ValidationError("A user with that email already exists.")
         return email
 
-from django import forms
-from .models import Post
-
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ['title', 'content']
+
+class CommentForm(forms.ModelForm):
+    content = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 3, 'placeholder': 'Write your comment here...'}),
+        label=''
+    )
+
+    class Meta:
+        model = Comment
+        fields = ['content']
