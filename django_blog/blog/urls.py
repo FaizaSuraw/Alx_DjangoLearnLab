@@ -9,7 +9,11 @@ from .views import (
     CommentUpdateView,
     CommentDeleteView,
     PostByTagListView,   
-    SearchResultsListView 
+    SearchResultsListView,
+    login_view,
+    logout_view,
+    profile_view,
+    register_view 
 )
 
 urlpatterns = [
@@ -26,4 +30,9 @@ urlpatterns = [
     path('tags/<slug:tag_slug>/', PostByTagListView.as_view(), name='posts-by-tag'),
 
     path('search/', SearchResultsListView.as_view(), name='search-results'),
+    
+        path('login/', login_view, name='login'),
+    path('register/', register_view, name='register'),
+    path('profile/', profile_view, name='profile'),
+    path('logout/', logout_view, name='logout'),
 ]
