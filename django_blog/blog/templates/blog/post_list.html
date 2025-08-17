@@ -1,0 +1,16 @@
+{% extends 'blog/base.html' %}
+{% block title %}All Posts{% endblock %}
+{% block content %}
+<h2 class="text-3xl font-bold mb-6">All Blog Posts</h2>
+
+{% for post in posts %}
+<div class="bg-white shadow-md rounded-lg mb-4 p-4">
+    <h3 class="text-xl font-semibold">{{ post.title }}</h3>
+    <p class="text-gray-700 mt-2">{{ post.content|truncatechars:150 }}</p>
+    <p class="text-gray-500 text-sm mt-2">By {{ post.author.username }} on {{ post.published_date|date:"M d, Y" }}</p>
+    <a href="{% url 'post-detail' post.pk %}" class="text-green-600 hover:underline mt-2 inline-block">Read More</a>
+</div>
+{% empty %}
+<p>No posts found.</p>
+{% endfor %}
+{% endblock %}
