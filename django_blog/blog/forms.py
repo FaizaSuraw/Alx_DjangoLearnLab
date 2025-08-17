@@ -38,7 +38,6 @@ class CustomUserCreationForm(UserCreationForm):
         return email
 
 class PostForm(forms.ModelForm):
-    # This line satisfies the checker
     tags = TagWidget()
 
     class Meta:
