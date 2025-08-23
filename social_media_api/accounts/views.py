@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, get_user_model
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
-from .models import CustomUser
+
 
 
 User = get_user_model()
@@ -58,11 +58,11 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 
 
 class FollowUserView(generics.GenericAPIView):  
-    queryset = CustomUser.objects.all()        
+    queryset = User.objects.all()        
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, user_id):
-        user_to_follow = get_object_or_404(CustomUser, id=user_id)
+        user_to_follow = get_object_or_404(User, id=user_id)
         if user_to_follow == request.user:
             return Response({"detail": "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
         request.user.following.add(user_to_follow)
@@ -70,10 +70,10 @@ class FollowUserView(generics.GenericAPIView):
 
 
 class UnfollowUserView(generics.GenericAPIView):  
-    queryset = CustomUser.objects.all()          
+    queryset = User.objects.all()          
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, user_id):
-        user_to_unfollow = get_object_or_404(CustomUser, id=user_id)
+        user_to_unfollow = get_object_or_404(User, id=user_id)
         request.user.following.remove(user_to_unfollow)
         return Response({"detail": f"You have unfollowed {user_to_unfollow.username}"}, status=status.HTTP_200_OK)
