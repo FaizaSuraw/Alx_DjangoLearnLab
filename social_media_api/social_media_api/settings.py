@@ -8,8 +8,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Security
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "unsafe-dev-key-change-in-prod")
-DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() == "true"
-ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+DEBUG = False
+ALLOWED_HOSTS = [
+    "social-media-api-rrkt.onrender.com",  # your Render URL
+    "127.0.0.1",
+    "localhost"
+]
+
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_SSL_REDIRECT = True  
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+X_FRAME_OPTIONS = "DENY"
+CSRF_TRUSTED_ORIGINS = ["https://social-media-api-rrkt.onrender.com"]
+
 
 # Installed apps
 INSTALLED_APPS = [
